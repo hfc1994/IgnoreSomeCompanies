@@ -1,0 +1,35 @@
+#ISC_toolbox {
+
+}
+
+#ISC_content {
+    position: fixed;
+    bottom: 215px;
+    margin-left: 890px;
+    background-color: rgba(80, 210, 255, 0.5);
+    height: 150px;
+    width: 200px;
+    display: none;
+}
+
+#ISC_input {
+    position: fixed;
+    bottom: 182px;
+    margin-left: 890px;
+    background-color: rgb(80, 210, 255, 0.5);
+    height: 30px;
+    width: 200px;
+    display: none;
+}
+
+#ISC_info {
+    position: fixed;
+    bottom: 126px;
+    margin-left: 1042px;
+    text-align: center;
+    padding-top: 5px;
+    color: #ffffff;
+    height: 48px;
+    width: 48px;
+    background-color: rgb(80, 210, 255)
+}
