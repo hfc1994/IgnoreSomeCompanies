@@ -9,7 +9,6 @@
     background-color: rgba(80, 210, 255, 0.5);
     height: 150px;
     width: 200px;
-    display: none;
     z-index: 10;
 }
 
@@ -20,7 +19,6 @@
     background-color: rgb(80, 210, 255, 0.5);
     height: 30px;
     width: 200px;
-    display: none;
     z-index: 10;
 }
 
@@ -34,4 +32,9 @@
     height: 48px;
     width: 48px;
     background-color: rgb(80, 210, 255)
+}
+
+.ISC_keyword {
+    display: inline-block;
+    background-color: #cdcdcd
 }

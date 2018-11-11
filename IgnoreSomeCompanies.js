@@ -2,29 +2,30 @@
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
 // @version      0.1
-// @description  try to take over the world!
-// @author       kumu
+// @description  try to ignore some companies that i do not want to!
+// @author       枯木
 // @match        https://search.51job.com/list/*
 // @grant        none
 // ==/UserScript==
-// @todo 鼠标选词，右键加入到ignoreList---右键菜单不能加东西，那么悬浮输入框的方式？？？
+// @todo 鼠标选词，右键加入到companies---右键菜单不能加东西，那么悬浮输入框的方式？？？
 // @todo 根据第一条，有增加肯定需要删除
-// @todo 在加入到ignoreList之前，需要和已有的tag对比，查看是否有包含或被包含的关系
+// @todo 在加入到companies之前，需要和已有的tag对比，查看是否有包含或被包含的关系
 // @todo 被忽略的条目鼠标悬浮可以半透明显示（参考-眼不见心不烦）
 // @todo 智联招聘和前程无忧分别适配
+// @todo .ISC_keyword布局和点击删除
+// @todo companies需要大小限制，限制50个关键字
 
-const ignoreList = ['白桃', '蓝鸽', '品茗', '阿里巴巴','恒生电子','中通文博','玖道','中软','网新','优创','希瑞亚斯']
-let comArray = []
+let companies = []
 
 // 初始化，用来读取localStorage
 // 存储格式key:companies,value:['','']
 function init() {
+    appendStyle()
+    appendFloatDiv()
     try {
-        comArray = JSON.parse(window.localStorage.getItem('companies'))
-        if (comArray === null || comArray === undefined || comArray.length === 0) {
+        companies = JSON.parse(window.localStorage.getItem('companies'))
+        if (companies === null || companies === undefined || companies.length === 0) {
             console.warn('页面暂无需要过滤的数据')
-            appendStyle()
-            appendInputFloatDiv()
             return
         } else {
             run()
@@ -37,6 +38,9 @@ function init() {
 function run() {
     let compDivs = document.querySelectorAll('.dw_table .el');
     compDivs.forEach((item) => {
+        if (alreadyBeIgnored(item)) {
+            return
+        }
         let cName = item.getElementsByClassName('t2')[0].textContent.trim()
         if (isIgnoreCompany(cName)) {
             console.log('匹配到：' + cName)
@@ -55,8 +59,9 @@ function appendStyle() {
     buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
     buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255)}')
-    buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;display: none;z-index: 10;}')
-    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);height: 150px;width: 200px;display: none;z-index: 10;}')
+    buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;z-index: 10;}')
+    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);height: 150px;width: 200px;z-index: 10;}')
+    buildStyle('.ISC_keyword {display: inline-block;background-color: #cdcdcd}')
 }
 
 // 根据给定内容构造样式
@@ -69,9 +74,19 @@ function buildStyle(content) {
 
 // 是否是需要被忽略的
 function isIgnoreCompany(cName) {
-    for (let i = 0; i < ignoreList.length; i++) {
-        let ignoreName = ignoreList[i]
+    for (let i = 0; i < companies.length; i++) {
+        let ignoreName = companies[i]
         if (cName === ignoreName || cName.indexOf(ignoreName) !== -1) {
+            return true
+        }
+    }
+    return false
+}
+
+// 是否已经被过滤过了,true为已经被过滤了
+function alreadyBeIgnored(node) {
+    for (let i=0; i<node.classList.length; i++) {
+        if ('ISC_ignoreNode' === node.classList[i]) {
             return true
         }
     }
@@ -112,18 +127,21 @@ function nodeToDisplay(event) {
 }
 
 // 添加toolbox
-function appendInputFloatDiv() {
+function appendFloatDiv() {
     let toolbox = document.createElement('div')
     toolbox.id = 'ISC_toolbox'
     let content = document.createElement('div')
     content.id = 'ISC_content'
+    content.style = 'display: none;'
     let input = document.createElement('div')
     input.id = 'ISC_input'
+    input.style = 'display: none;'
     input.innerHTML = '<input id="filterInput" placeholder="过滤的关键字" type="text"/><button id="filterButton" type="button">添加</button>'
     let info = document.createElement('div')
     info.id = 'ISC_info'
     info.innerHTML = '<span>添加<br/>过滤</span>'
     info.onclick = function() {
+        // 切换显示与否
         let obj1 = document.getElementById('ISC_input')
         let obj2 = document.getElementById('ISC_content')
         if (obj1.style.display === 'none') {
@@ -143,8 +161,10 @@ function appendInputFloatDiv() {
 
     document.getElementById('filterButton').onclick = function () {
         let keyword = document.getElementById('filterInput').value.trim()
-        let status = checkAndModifiedArray(comArray, keyword)
+        let status = checkAndModifiedArray(keyword)
         if (status) {
+            modifyLocalStorage()
+            document.getElementById('ISC_content').appendChild(buildContentChildNode(keyword))
             // 在content中显示该关键字
         } else {
             alert('关键字' + keyword + '已经存在，或者已经存在比它更详细的关键字了')
@@ -154,31 +174,42 @@ function appendInputFloatDiv() {
     }
 }
 
-// 检查str是否已经在array中存在，或者str是否包含或被包含于array的某个值
+// 检查str是否已经在companies中存在，或者str是否包含或被包含于companies的某个值
 // return true 表示之前没有或其是一个更具体的值，现在已经添加进去了
 // return false 表示之前就有，或已有比其更具体值的存在
-function checkAndModifiedArray(array, str) {
-    let len = sourceArray.length
+function checkAndModifiedArray(str) {
+    if (companies === null) {
+        companies = []
+    }
+    let len = companies.length
     for (let i=0; i<len; i++) {
-        if (str === array[i]) {
+        if (str === companies[i]) {
             return false
-        } else if (array[i].indexOf(str) !== -1) {
-            // str比array[i]的值更具体，那么就需要用str替换对应的值
-            array[i] = str
+        } else if (companies[i].indexOf(str) !== -1) {
+            // str比companies[i]的值更具体，那么就需要用str替换对应的值
+            companies[i] = str
             return true
-        } else if (str.indexOf(array[i])) {
+        } else if (str.indexOf(companies[i]) !== -1) {
             return false
         }
     }
 
-    array.push(str)
+    companies.push(str)
     return true
 }
 
-// type 可能是增加关键字导致的修改，也可能是因为删除关键字
-function modifyLocalStorage(array, type) {
-    window.localStorage.setItem('companies', JSON.stringify(array))
-    // @todo 页面的过滤情况更新
+function modifyLocalStorage() {
+    window.localStorage.setItem('companies', JSON.stringify(companies))
+    run()
+}
+
+// content区域里面的keyword节点
+function buildContentChildNode(val) {
+    let childNode = document.createElement('div')
+    childNode.classList.add('ISC_keyword')
+    childNode.textContent = val
+
+    return childNode
 }
 
 // 入口函数
