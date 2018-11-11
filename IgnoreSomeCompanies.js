@@ -14,13 +14,14 @@
 // @todo 智联招聘和前程无忧分别适配
 
 const ignoreList = ['白桃', '蓝鸽', '品茗', '阿里巴巴','恒生电子','中通文博','玖道','中软','网新','优创','希瑞亚斯']
+let comArray = []
 
 // 初始化，用来读取localStorage
 // 存储格式key:companies,value:['','']
 function init() {
     try {
-        let comArray = JSON.parse(window.localStorage.getItem('companies'))
-        if (comArray === null || comArray === undefined) {
+        comArray = JSON.parse(window.localStorage.getItem('companies'))
+        if (comArray === null || comArray === undefined || comArray.length === 0) {
             console.warn('页面暂无需要过滤的数据')
             appendStyle()
             appendInputFloatDiv()
@@ -54,8 +55,8 @@ function appendStyle() {
     buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
     buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255)}')
-    buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;display: none;}')
-    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);height: 150px;width: 200px;display: none;}')
+    buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;display: none;z-index: 10;}')
+    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);height: 150px;width: 200px;display: none;z-index: 10;}')
 }
 
 // 根据给定内容构造样式
@@ -110,6 +111,7 @@ function nodeToDisplay(event) {
     }
 }
 
+// 添加toolbox
 function appendInputFloatDiv() {
     let toolbox = document.createElement('div')
     toolbox.id = 'ISC_toolbox'
@@ -117,7 +119,7 @@ function appendInputFloatDiv() {
     content.id = 'ISC_content'
     let input = document.createElement('div')
     input.id = 'ISC_input'
-    input.innerHTML = '<input placeholder="过滤的关键字" type="text"/><button type="button">添加</button>'
+    input.innerHTML = '<input id="filterInput" placeholder="过滤的关键字" type="text"/><button id="filterButton" type="button">添加</button>'
     let info = document.createElement('div')
     info.id = 'ISC_info'
     info.innerHTML = '<span>添加<br/>过滤</span>'
@@ -138,6 +140,45 @@ function appendInputFloatDiv() {
     toolbox.appendChild(info)
 
     document.getElementById('resultList').append(toolbox)
+
+    document.getElementById('filterButton').onclick = function () {
+        let keyword = document.getElementById('filterInput').value.trim()
+        let status = checkAndModifiedArray(comArray, keyword)
+        if (status) {
+            // 在content中显示该关键字
+        } else {
+            alert('关键字' + keyword + '已经存在，或者已经存在比它更详细的关键字了')
+        }
+
+        document.getElementById('filterInput').value = ''
+    }
+}
+
+// 检查str是否已经在array中存在，或者str是否包含或被包含于array的某个值
+// return true 表示之前没有或其是一个更具体的值，现在已经添加进去了
+// return false 表示之前就有，或已有比其更具体值的存在
+function checkAndModifiedArray(array, str) {
+    let len = sourceArray.length
+    for (let i=0; i<len; i++) {
+        if (str === array[i]) {
+            return false
+        } else if (array[i].indexOf(str) !== -1) {
+            // str比array[i]的值更具体，那么就需要用str替换对应的值
+            array[i] = str
+            return true
+        } else if (str.indexOf(array[i])) {
+            return false
+        }
+    }
+
+    array.push(str)
+    return true
+}
+
+// type 可能是增加关键字导致的修改，也可能是因为删除关键字
+function modifyLocalStorage(array, type) {
+    window.localStorage.setItem('companies', JSON.stringify(array))
+    // @todo 页面的过滤情况更新
 }
 
 // 入口函数
