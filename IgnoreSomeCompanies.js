@@ -7,13 +7,11 @@
 // @match        https://search.51job.com/list/*
 // @grant        none
 // ==/UserScript==
-// @todo 鼠标选词，右键加入到companies---右键菜单不能加东西，那么悬浮输入框的方式？？？
-// @todo 根据第一条，有增加肯定需要删除
-// @todo 在加入到companies之前，需要和已有的tag对比，查看是否有包含或被包含的关系
+// @todo 更详细的关键字增加后，之前的关键字从companies删除后，ISC_content也要同步更新
 // @todo 被忽略的条目鼠标悬浮可以半透明显示（参考-眼不见心不烦）
 // @todo 智联招聘和前程无忧分别适配
-// @todo .ISC_keyword布局和点击删除
 // @todo companies需要大小限制，限制50个关键字
+// @todo 删除关键字后，对应的条目要恢复可见
 
 let companies = []
 
@@ -28,6 +26,9 @@ function init() {
             console.warn('页面暂无需要过滤的数据')
             return
         } else {
+            for (let i=0; i<companies.length; i++) {
+                document.getElementById('ISC_content').appendChild(buildContentChildNode(companies[i], i))
+            }
             run()
         }
     } catch(err) {
@@ -60,8 +61,8 @@ function appendStyle() {
     // toolbox节点里面的
     buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255)}')
     buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;z-index: 10;}')
-    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);height: 150px;width: 200px;z-index: 10;}')
-    buildStyle('.ISC_keyword {display: inline-block;background-color: #cdcdcd}')
+    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);min-height: 150px;width: 200px;z-index: 10;}')
+    buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;}')
 }
 
 // 根据给定内容构造样式
@@ -161,10 +162,15 @@ function appendFloatDiv() {
 
     document.getElementById('filterButton').onclick = function () {
         let keyword = document.getElementById('filterInput').value.trim()
-        let status = checkAndModifiedArray(keyword)
+        if (keyword.length === 0) {
+            alert('不能使用空字符串')
+            return
+        }
+        let status = addIntoCompanies(keyword)
         if (status) {
-            modifyLocalStorage()
-            document.getElementById('ISC_content').appendChild(buildContentChildNode(keyword))
+            let index = modifyLocalStorage()
+            document.getElementById('ISC_content').appendChild(buildContentChildNode(keyword, index))
+            run()
             // 在content中显示该关键字
         } else {
             alert('关键字' + keyword + '已经存在，或者已经存在比它更详细的关键字了')
@@ -177,7 +183,7 @@ function appendFloatDiv() {
 // 检查str是否已经在companies中存在，或者str是否包含或被包含于companies的某个值
 // return true 表示之前没有或其是一个更具体的值，现在已经添加进去了
 // return false 表示之前就有，或已有比其更具体值的存在
-function checkAndModifiedArray(str) {
+function addIntoCompanies(str) {
     if (companies === null) {
         companies = []
     }
@@ -200,16 +206,43 @@ function checkAndModifiedArray(str) {
 
 function modifyLocalStorage() {
     window.localStorage.setItem('companies', JSON.stringify(companies))
-    run()
+    return companies.length-1
 }
 
-// content区域里面的keyword节点
-function buildContentChildNode(val) {
+// ISC_content区域里面的keyword节点
+function buildContentChildNode(val, index) {
     let childNode = document.createElement('div')
     childNode.classList.add('ISC_keyword')
+    let id = 'ISC_keyword_' + index
+    childNode.id = id
     childNode.textContent = val
+    childNode.onclick = function (event) {
+        let tmpIndex = parseInt(event.target.id.split('_')[2])
+        event.target.remove()
+        deleteFromCompanies(tmpIndex)
+        modifyLocalStorage()
+        correctNodeId(tmpIndex)
+        run()
+    }
 
     return childNode
+}
+
+// index是实际的索引值
+function deleteFromCompanies(index) {
+    companies.splice(index, 1)
+}
+
+// 点击删除一个节点后，后续节点的id就需要修正
+// id值的最后一部分是代表这个关键字在companies中的序号
+// index是刚被删除的节点的序号
+function correctNodeId(index) {
+    for (let i = index+1; i<=companies.length; i++) {
+        let node  = document.getElementById('ISC_keyword_' + i)
+        if (null !== node) {
+            node.id = 'ISC_keyword_' + (i - 1)
+        }
+    }
 }
 
 // 入口函数
