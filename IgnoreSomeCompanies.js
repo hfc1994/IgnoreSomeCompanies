@@ -8,10 +8,8 @@
 // @grant        none
 // ==/UserScript==
 // @todo 更详细的关键字增加后，之前的关键字从companies删除后，ISC_content也要同步更新
-// @todo 被忽略的条目鼠标悬浮可以半透明显示（参考-眼不见心不烦）
 // @todo 智联招聘和前程无忧分别适配
-// @todo companies需要大小限制，限制50个关键字
-// @todo 删除关键字后，对应的条目要恢复可见
+// @todo 添加css动画
 
 let companies = []
 
@@ -45,7 +43,8 @@ function run() {
         let cName = item.getElementsByClassName('t2')[0].textContent.trim()
         if (isIgnoreCompany(cName)) {
             console.log('匹配到：' + cName)
-            handleTargetNode(item, cName)
+            addIgnoreClassTag(item)
+            appendNewChildNode(item, cName)
         }
     })
 }
@@ -59,10 +58,13 @@ function appendStyle() {
     // 新添加的节点
     buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
-    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255)}')
+    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255)};box-shadow: 2px 2px 5px 0px #a3a3a3;')
     buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;z-index: 10;}')
     buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);min-height: 150px;width: 200px;z-index: 10;}')
-    buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;}')
+    buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
+
+    buildStyle('#filterInput, #filterButton {margin: 3px 2px;}')
+    buildStyle('#ISC_node_copy {opacity: 0.5;}')
 }
 
 // 根据给定内容构造样式
@@ -95,12 +97,11 @@ function alreadyBeIgnored(node) {
 }
 
 // 处理需要被忽略的目标节点
-function handleTargetNode(node, name) {
+function addIgnoreClassTag(node) {
     node.classList.add('ISC_ignoreNode')
     for (let j=0; j<node.children.length; j++) {
         node.children[j].classList.add('ISC_ignoreChildNode')
     }
-    appendNewChildNode(node, name)
 }
 
 // 被忽略的节点上增加一个div，用于显示忽略信息
@@ -109,6 +110,26 @@ function appendNewChildNode(node, name) {
     div.classList.add('ISC_appendNode')
     div.onclick = nodeToDisplay
     div.innerText = '被忽略的公司 -> ' + name
+    div.onmouseenter = function (event) {
+        let fNode = event.target.parentNode
+        let fNodeCopy = fNode.cloneNode(true)
+        fNodeCopy.classList.remove('ISC_ignoreNode')
+        fNodeCopy.id = 'ISC_node_copy'
+        fNodeCopy.getElementsByClassName('ISC_appendNode')[0].remove()
+        for (let i=0; i<fNodeCopy.children.length; i++) {
+            fNodeCopy.children[i].classList.remove('ISC_ignoreChildNode')
+        }
+
+        let nextNode = fNode.nextSibling
+        if (nextNode === null) {
+            fNode.parentNode.append(fNodeCopy)
+        } else {
+            fNode.parentNode.insertBefore(fNodeCopy, nextNode)
+        }
+    }
+    div.onmouseleave = function () {
+        document.getElementById('ISC_node_copy').remove()
+    }
     node.appendChild(div)
 }
 
@@ -166,6 +187,11 @@ function appendFloatDiv() {
             alert('不能使用空字符串')
             return
         }
+        if (companies.length === 32) {
+            alert('过滤关键字限定数量为32，此时过滤关键字数量已达上限')
+            document.getElementById('filterInput').value = ''
+            return
+        }
         let status = addIntoCompanies(keyword)
         if (status) {
             let index = modifyLocalStorage()
@@ -218,11 +244,12 @@ function buildContentChildNode(val, index) {
     childNode.textContent = val
     childNode.onclick = function (event) {
         let tmpIndex = parseInt(event.target.id.split('_')[2])
+        let tmpKeyword = event.target.innerText
         event.target.remove()
         deleteFromCompanies(tmpIndex)
         modifyLocalStorage()
         correctNodeId(tmpIndex)
-        run()
+        removeIgnoreClassTag(tmpKeyword)
     }
 
     return childNode
@@ -243,6 +270,22 @@ function correctNodeId(index) {
             node.id = 'ISC_keyword_' + (i - 1)
         }
     }
+}
+
+// 被移除的关键字对应的节点被恢复可见
+function removeIgnoreClassTag(keyword) {
+    let compDivs = document.querySelectorAll('.dw_table .el');
+    compDivs.forEach(node => {
+        if (alreadyBeIgnored(node)) {
+            let cName = node.getElementsByClassName('t2')[0].textContent.trim()
+            if (cName.indexOf(keyword) !== -1) {
+                node.classList.remove('ISC_ignoreNode')
+                for (let j=0; j<node.children.length; j++) {
+                    node.children[j].classList.remove('ISC_ignoreChildNode')
+                }
+            }
+        }
+    })
 }
 
 // 入口函数

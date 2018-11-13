@@ -31,7 +31,8 @@
     color: #ffffff;
     height: 48px;
     width: 48px;
-    background-color: rgb(80, 210, 255)
+    background-color: rgb(80, 210, 255);
+    box-shadow: 2px 2px 5px 0px #a3a3a3;
 }
 
 .ISC_keyword {
@@ -41,4 +42,13 @@
     background-color: #cdcdcd;
     color: #000;
     cursor: pointer;
+    box-shadow: 2px 2px 4px 0px #a3a3a3;
+}
+
+#filterInput, #filterButton {
+    margin: 3px 2px;
+}
+
+#ISC_node_copy {
+    opacity: 0.5;
 }
