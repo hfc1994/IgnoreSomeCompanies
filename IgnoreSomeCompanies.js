@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      0.1
+// @version      0.45
 // @description  try to ignore some companies that i do not want to!
 // @author       枯木
 // @match        https://search.51job.com/list/*
 // @grant        none
 // ==/UserScript==
-// @todo 更详细的关键字增加后，之前的关键字从companies删除后，ISC_content也要同步更新
 // @todo 智联招聘和前程无忧分别适配
 // @todo 添加css动画
 
@@ -64,7 +63,7 @@ function appendStyle() {
     buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
 
     buildStyle('#filterInput, #filterButton {margin: 3px 2px;}')
-    buildStyle('#ISC_node_copy {opacity: 0.5;}')
+    buildStyle('#ISC_node_copy {opacity: 0.4;}')
 }
 
 // 根据给定内容构造样式
@@ -193,9 +192,12 @@ function appendFloatDiv() {
             return
         }
         let status = addIntoCompanies(keyword)
-        if (status) {
+        if (status !== -1) {
             let index = modifyLocalStorage()
-            document.getElementById('ISC_content').appendChild(buildContentChildNode(keyword, index))
+            if (status !== 0) {
+                // 等于0时已经在检测时替换掉了
+                document.getElementById('ISC_content').appendChild(buildContentChildNode(keyword, index))
+            }
             run()
             // 在content中显示该关键字
         } else {
@@ -204,11 +206,19 @@ function appendFloatDiv() {
 
         document.getElementById('filterInput').value = ''
     }
+
+    // 回车取代点击按钮添加过滤
+    document.getElementById('filterInput').onkeydown = function(e){
+        if(e.keyCode === 13){
+            document.getElementById('filterButton').click()
+        }
+    }
 }
 
 // 检查str是否已经在companies中存在，或者str是否包含或被包含于companies的某个值
-// return true 表示之前没有或其是一个更具体的值，现在已经添加进去了
-// return false 表示之前就有，或已有比其更具体值的存在
+// return 1 表示之前没有，现在已经添加进去了
+// return 0 表示是一个更具体的值
+// return -1 表示之前就有，或已有比其更具体值的存在
 function addIntoCompanies(str) {
     if (companies === null) {
         companies = []
@@ -216,18 +226,19 @@ function addIntoCompanies(str) {
     let len = companies.length
     for (let i=0; i<len; i++) {
         if (str === companies[i]) {
-            return false
+            return -1
         } else if (companies[i].indexOf(str) !== -1) {
             // str比companies[i]的值更具体，那么就需要用str替换对应的值
             companies[i] = str
-            return true
+            document.getElementById('ISC_keyword_' + i).textContent = str
+            return 0
         } else if (str.indexOf(companies[i]) !== -1) {
-            return false
+            return -1
         }
     }
 
     companies.push(str)
-    return true
+    return 1
 }
 
 function modifyLocalStorage() {
