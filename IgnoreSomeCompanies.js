@@ -4,6 +4,7 @@
 // @version      0.45
 // @description  try to ignore some companies that i do not want to!
 // @author       枯木
+// @icon         https://avatars2.githubusercontent.com/u/32028349?s=40&v=4
 // @match        https://search.51job.com/list/*
 // @grant        none
 // ==/UserScript==
@@ -57,10 +58,15 @@ function appendStyle() {
     // 新添加的节点
     buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
-    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255)};box-shadow: 2px 2px 5px 0px #a3a3a3;')
-    buildStyle('#ISC_input {position: fixed;bottom: 182px;margin-left: 890px;background-color: rgb(80, 210, 255, 0.5);height: 30px;width: 200px;z-index: 10;}')
-    buildStyle('#ISC_content {position: fixed;bottom: 215px;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);min-height: 150px;width: 200px;z-index: 10;}')
+    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255);}')
+    buildStyle('#ISC_info:hover {border-radius: 10px;box-shadow: 2px 2px 5px 0px #a3a3a3;}')
+    buildStyle('#ISC_info:active {transform: scale(0.8);-webkit-transform: scale(0.8);-moz-transform: scale(0.8);-ms-transform: scale(0.8);}')
+    buildStyle('#ISC_input {bottom: 182px;height: 30px;}')
+    buildStyle('#ISC_content {bottom: 215px;min-height: 150px;}')
+    buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;z-index: 10;}')
     buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
+    buildStyle('.ISC_keyword:hover {transform: scale(1.1);-webkit-transform: scale(1.1);-moz-transform: scale(1.1);-ms-transform: scale(1.1);}')
+    buildStyle('#ISC_info,.ISC_keyword {transition: all 0.3s;-webkit-transition: all 0.3s;-moz-transition: all 0.3s;-ms-transition: all 0.3s;}')
 
     buildStyle('#filterInput, #filterButton {margin: 3px 2px;}')
     buildStyle('#ISC_node_copy {opacity: 0.4;}')
@@ -107,8 +113,8 @@ function addIgnoreClassTag(node) {
 function appendNewChildNode(node, name) {
     let div = document.createElement('div')
     div.classList.add('ISC_appendNode')
-    div.onclick = nodeToDisplay
     div.innerText = '被忽略的公司 -> ' + name
+    div.onclick = nodeToDisplay
     div.onmouseenter = function (event) {
         let fNode = event.target.parentNode
         let fNodeCopy = fNode.cloneNode(true)
@@ -145,6 +151,8 @@ function nodeToDisplay(event) {
             children[i].remove()
         }
     }
+
+    document.getElementById('ISC_node_copy').remove()
 }
 
 // 添加toolbox

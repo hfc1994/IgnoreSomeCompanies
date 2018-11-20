@@ -3,21 +3,20 @@
 }
 
 #ISC_content {
-    position: fixed;
     bottom: 215px;
-    margin-left: 890px;
-    background-color: rgba(80, 210, 255, 0.5);
     min-height: 150px;
-    width: 200px;
-    z-index: 10;
 }
 
 #ISC_input {
-    position: fixed;
     bottom: 182px;
-    margin-left: 890px;
-    background-color: rgb(80, 210, 255, 0.5);
     height: 30px;
+}
+
+#ISC_content,#ISC_input {
+    position: fixed;
+    margin-left: 890px;
+    background-color: rgba(80, 210, 255, 0.5);
+    box-shadow: 1px 1px 3px 0px #a3a3a3;
     width: 200px;
     z-index: 10;
 }
@@ -32,7 +31,25 @@
     height: 48px;
     width: 48px;
     background-color: rgb(80, 210, 255);
+}
+
+#ISC_info:hover {
+    border-radius: 10px;
     box-shadow: 2px 2px 5px 0px #a3a3a3;
+}
+
+#ISC_info,.ISC_keyword  {
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+}
+
+#ISC_info:active {
+    transform: scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
 }
 
 .ISC_keyword {
@@ -43,6 +60,13 @@
     color: #000;
     cursor: pointer;
     box-shadow: 2px 2px 4px 0px #a3a3a3;
+}
+
+.ISC_keyword:hover {
+    transform: scale(1.1);
+    -webkit-transform: scale(1.1);
+    -moz-transform: scale(1.1);
+    -ms-transform: scale(1.1);
 }
 
 #filterInput, #filterButton {
