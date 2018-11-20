@@ -8,8 +8,8 @@
 // @match        https://search.51job.com/list/*
 // @grant        none
 // ==/UserScript==
-// @todo 智联招聘和前程无忧分别适配
-// @todo 添加css动画
+// @todo 代码review 重构
+// @todo 为智联招聘适配
 
 let companies = []
 
@@ -58,12 +58,13 @@ function appendStyle() {
     // 新添加的节点
     buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
-    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;color: #ffffff;height: 48px;width: 48px;background-color: rgb(80, 210, 255);}')
+    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
     buildStyle('#ISC_info:hover {border-radius: 10px;box-shadow: 2px 2px 5px 0px #a3a3a3;}')
     buildStyle('#ISC_info:active {transform: scale(0.8);-webkit-transform: scale(0.8);-moz-transform: scale(0.8);-ms-transform: scale(0.8);}')
     buildStyle('#ISC_input {bottom: 182px;height: 30px;}')
     buildStyle('#ISC_content {bottom: 215px;min-height: 150px;}')
-    buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;background-color: rgba(80, 210, 255, 0.5);box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;z-index: 10;}')
+    buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
+    buildStyle('#ISC_content,#ISC_input,#ISC_info {background-color: #ecf5ff;border: 1px solid #409eff;color: #409eff;}')
     buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
     buildStyle('.ISC_keyword:hover {transform: scale(1.1);-webkit-transform: scale(1.1);-moz-transform: scale(1.1);-ms-transform: scale(1.1);}')
     buildStyle('#ISC_info,.ISC_keyword {transition: all 0.3s;-webkit-transition: all 0.3s;-moz-transition: all 0.3s;-ms-transition: all 0.3s;}')
@@ -171,14 +172,14 @@ function appendFloatDiv() {
     info.innerHTML = '<span>添加<br/>过滤</span>'
     info.onclick = function() {
         // 切换显示与否
-        let obj1 = document.getElementById('ISC_input')
-        let obj2 = document.getElementById('ISC_content')
-        if (obj1.style.display === 'none') {
-            obj1.style.display = 'block'
-            obj2.style.display = 'block'
+        let visible = divVisibleSwitch()
+        if (visible === 'block') {
+            document.onwheel = function() {
+                divVisibleSwitch()
+                document.onwheel = undefined
+            }
         } else {
-            obj1.style.display = 'none'
-            obj2.style.display = 'none'
+            document.onwheel = undefined
         }
     }
 
@@ -220,6 +221,20 @@ function appendFloatDiv() {
         if(e.keyCode === 13){
             document.getElementById('filterButton').click()
         }
+    }
+}
+
+function divVisibleSwitch() {
+    let obj1 = document.getElementById('ISC_input')
+    let obj2 = document.getElementById('ISC_content')
+    if (obj1.style.display === 'none') {
+        obj1.style.display = 'block'
+        obj2.style.display = 'block'
+        return 'block'
+    } else {
+        obj1.style.display = 'none'
+        obj2.style.display = 'none'
+        return 'none'
     }
 }
 

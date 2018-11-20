@@ -15,9 +15,9 @@
 #ISC_content,#ISC_input {
     position: fixed;
     margin-left: 890px;
-    background-color: rgba(80, 210, 255, 0.5);
     box-shadow: 1px 1px 3px 0px #a3a3a3;
     width: 200px;
+    opacity: 0.75;
     z-index: 10;
 }
 
@@ -27,10 +27,14 @@
     margin-left: 1042px;
     text-align: center;
     padding-top: 5px;
-    color: #ffffff;
     height: 48px;
     width: 48px;
-    background-color: rgb(80, 210, 255);
+}
+
+#ISC_content,#ISC_input,#ISC_info {
+    background-color: #ecf5ff;
+    border: 1px solid #409eff;
+    color: #409eff;
 }
 
 #ISC_info:hover {
