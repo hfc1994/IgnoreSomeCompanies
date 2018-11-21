@@ -8,7 +8,6 @@
 // @match        https://search.51job.com/list/*
 // @grant        none
 // ==/UserScript==
-// @todo 代码review 重构
 // @todo 为智联招聘适配
 
 let companies = []
@@ -16,7 +15,7 @@ let companies = []
 // 初始化，用来读取localStorage
 // 存储格式key:companies,value:['','']
 function init() {
-    appendStyle()
+    appendGlobalStyle()
     appendFloatDiv()
     try {
         companies = JSON.parse(window.localStorage.getItem('companies'))
@@ -27,14 +26,14 @@ function init() {
             for (let i=0; i<companies.length; i++) {
                 document.getElementById('ISC_content').appendChild(buildContentChildNode(companies[i], i))
             }
-            run()
+            doIgnore()
         }
     } catch(err) {
         console.error(err)
     }
 }
 
-function run() {
+function doIgnore() {
     let compDivs = document.querySelectorAll('.dw_table .el');
     compDivs.forEach((item) => {
         if (alreadyBeIgnored(item)) {
@@ -50,7 +49,7 @@ function run() {
 }
 
 // 添加一些全局样式
-function appendStyle() {
+function appendGlobalStyle() {
     // 需要被忽略的节点
     buildStyle('.ISC_ignoreNode{height:30px !important;background-color:#ffe8cd !important;}')
     // 需要被忽略的子节点
@@ -115,7 +114,23 @@ function appendNewChildNode(node, name) {
     let div = document.createElement('div')
     div.classList.add('ISC_appendNode')
     div.innerText = '被忽略的公司 -> ' + name
-    div.onclick = nodeToDisplay
+
+    // 把被忽略的节点给恢复
+    div.onclick = function (event) {
+        event.target.parentNode.classList.remove('ISC_ignoreNode')
+        let children = event.target.parentNode.children
+        // HTMLCollection没有forEach
+        // appendNode是append上去的，是在最后一个
+        for (let i=0; i<children.length; i++) {
+            if (children[i].classList.contains('ISC_ignoreChildNode')) {
+                children[i].classList.remove('ISC_ignoreChildNode')
+            } else if (children[i].classList.contains('ISC_appendNode')) {
+                children[i].remove()
+            }
+        }
+        document.getElementById('ISC_node_copy').remove()
+    }
+    
     div.onmouseenter = function (event) {
         let fNode = event.target.parentNode
         let fNodeCopy = fNode.cloneNode(true)
@@ -137,23 +152,6 @@ function appendNewChildNode(node, name) {
         document.getElementById('ISC_node_copy').remove()
     }
     node.appendChild(div)
-}
-
-// 把被忽略的节点给恢复
-function nodeToDisplay(event) {
-    event.target.parentNode.classList.remove('ISC_ignoreNode')
-    let children = event.target.parentNode.children
-    // HTMLCollection没有forEach
-    // appendNode是append上去的，是在最后一个
-    for (let i=0; i<children.length; i++) {
-        if (children[i].classList.contains('ISC_ignoreChildNode')) {
-            children[i].classList.remove('ISC_ignoreChildNode')
-        } else if (children[i].classList.contains('ISC_appendNode')) {
-            children[i].remove()
-        }
-    }
-
-    document.getElementById('ISC_node_copy').remove()
 }
 
 // 添加toolbox
@@ -205,10 +203,10 @@ function appendFloatDiv() {
             let index = modifyLocalStorage()
             if (status !== 0) {
                 // 等于0时已经在检测时替换掉了
+                // 在content中显示该关键字
                 document.getElementById('ISC_content').appendChild(buildContentChildNode(keyword, index))
             }
-            run()
-            // 在content中显示该关键字
+            doIgnore()
         } else {
             alert('关键字' + keyword + '已经存在，或者已经存在比它更详细的关键字了')
         }
@@ -216,7 +214,7 @@ function appendFloatDiv() {
         document.getElementById('filterInput').value = ''
     }
 
-    // 回车取代点击按钮添加过滤
+    // 敲击回车添加过滤
     document.getElementById('filterInput').onkeydown = function(e){
         if(e.keyCode === 13){
             document.getElementById('filterButton').click()
@@ -224,6 +222,7 @@ function appendFloatDiv() {
     }
 }
 
+// 可见与不可见间转换
 function divVisibleSwitch() {
     let obj1 = document.getElementById('ISC_input')
     let obj2 = document.getElementById('ISC_content')
@@ -264,6 +263,7 @@ function addIntoCompanies(str) {
     return 1
 }
 
+// 返回值作为新增节点的id
 function modifyLocalStorage() {
     window.localStorage.setItem('companies', JSON.stringify(companies))
     return companies.length-1
@@ -280,18 +280,13 @@ function buildContentChildNode(val, index) {
         let tmpIndex = parseInt(event.target.id.split('_')[2])
         let tmpKeyword = event.target.innerText
         event.target.remove()
-        deleteFromCompanies(tmpIndex)
+        companies.splice(tmpIndex, 1)
         modifyLocalStorage()
         correctNodeId(tmpIndex)
         removeIgnoreClassTag(tmpKeyword)
     }
 
     return childNode
-}
-
-// index是实际的索引值
-function deleteFromCompanies(index) {
-    companies.splice(index, 1)
 }
 
 // 点击删除一个节点后，后续节点的id就需要修正
@@ -306,7 +301,7 @@ function correctNodeId(index) {
     }
 }
 
-// 被移除的关键字对应的节点被恢复可见
+// 被移除的关键字对应的条目被恢复可见
 function removeIgnoreClassTag(keyword) {
     let compDivs = document.querySelectorAll('.dw_table .el');
     compDivs.forEach(node => {
