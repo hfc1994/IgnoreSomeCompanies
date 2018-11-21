@@ -1,20 +1,24 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      0.45
+// @version      0.5
 // @description  try to ignore some companies that i do not want to!
 // @author       枯木
 // @icon         https://avatars2.githubusercontent.com/u/32028349?s=40&v=4
 // @match        https://search.51job.com/list/*
+// @match        https://sou.zhaopin.com/*
 // @grant        none
 // ==/UserScript==
 // @todo 为智联招聘适配
+// @todo appendFloatDiv中悬浮toolbox的位置定位
 
 let companies = []
+let website = ''
 
 // 初始化，用来读取localStorage
 // 存储格式key:companies,value:['','']
 function init() {
+    judgeWebsite()
     appendGlobalStyle()
     appendFloatDiv()
     try {
@@ -30,6 +34,15 @@ function init() {
         }
     } catch(err) {
         console.error(err)
+    }
+}
+
+function judgeWebsite() {
+    let href = window.location.href
+    if (href.indexOf('sou.zhaopin.com') !== -1) {
+        website = 'zlzp'
+    } else {
+        website = '51job'
     }
 }
 
