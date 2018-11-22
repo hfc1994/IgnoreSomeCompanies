@@ -44,6 +44,7 @@ function judgeWebsite() {
     } else {
         website = '51job'
     }
+    console.log(website)
 }
 
 function doIgnore() {
@@ -70,12 +71,24 @@ function appendGlobalStyle() {
     // 新添加的节点
     buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
-    buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
+    if (website === '51job') {
+        buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
+        buildStyle('#ISC_input {bottom: 182px;height: 30px;}')
+        buildStyle('#ISC_content {bottom: 215px;min-height: 150px;}')
+        buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
+    } else {
+        buildStyle('#ISC_info {position: fixed;bottom: 25px;margin-left: 800px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
+        buildStyle('#ISC_input {bottom: 75px;height: 30px;}')
+        buildStyle('#ISC_content {bottom: 107px;min-height: 150px;}')
+        buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 800px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
+
+        // 额外调整UI的
+        buildStyle('#filterInput {line-height: initial;background: #fff;width: 155px;height: 21px;border: 1px solid #aaa;}')
+        buildStyle('#filterButton {border: 1px solid #aaa;background-color: #eee;width: 31px;height: 22px;font-size: 14px;margin-bottom: 6px;}')
+    }
+    
     buildStyle('#ISC_info:hover {border-radius: 10px;box-shadow: 2px 2px 5px 0px #a3a3a3;}')
     buildStyle('#ISC_info:active {transform: scale(0.8);-webkit-transform: scale(0.8);-moz-transform: scale(0.8);-ms-transform: scale(0.8);}')
-    buildStyle('#ISC_input {bottom: 182px;height: 30px;}')
-    buildStyle('#ISC_content {bottom: 215px;min-height: 150px;}')
-    buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
     buildStyle('#ISC_content,#ISC_input,#ISC_info {background-color: #ecf5ff;border: 1px solid #409eff;color: #409eff;}')
     buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
     buildStyle('.ISC_keyword:hover {transform: scale(1.1);-webkit-transform: scale(1.1);-moz-transform: scale(1.1);-ms-transform: scale(1.1);}')
@@ -198,7 +211,11 @@ function appendFloatDiv() {
     toolbox.appendChild(input)
     toolbox.appendChild(info)
 
-    document.getElementById('resultList').append(toolbox)
+    if (website === '51job') {
+        document.getElementById('resultList').append(toolbox)
+    } else {
+        document.getElementById('listItemPile').append(toolbox)
+    }
 
     document.getElementById('filterButton').onclick = function () {
         let keyword = document.getElementById('filterInput').value.trim()

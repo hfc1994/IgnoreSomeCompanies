@@ -2,29 +2,66 @@
 
 }
 
-#ISC_content {
+/* 51job */
+/* #ISC_content {
     bottom: 215px;
+    min-height: 150px;
+} */
+
+/* zlzp */
+#ISC_content {
+    bottom: 107px;
     min-height: 150px;
 }
 
-#ISC_input {
+/* 51job */
+/* #ISC_input {
     bottom: 182px;
+    height: 30px;
+} */
+
+/* zlzp */
+#ISC_input {
+    bottom: 75px;
     height: 30px;
 }
 
-#ISC_content,#ISC_input {
+/* 51job */
+/* #ISC_content,#ISC_input {
     position: fixed;
     margin-left: 890px;
     box-shadow: 1px 1px 3px 0px #a3a3a3;
     width: 200px;
     opacity: 0.75;
     z-index: 10;
+} */
+
+/* zlzp */
+#ISC_content,#ISC_input {
+    position: fixed;
+    margin-left: 800px;
+    box-shadow: 1px 1px 3px 0px #a3a3a3;
+    width: 200px;
+    opacity: 0.75;
+    z-index: 10;
 }
 
-#ISC_info {
+ /* 51job */
+/* #ISC_info {
     position: fixed;
     bottom: 126px;
     margin-left: 1042px;
+    text-align: center;
+    padding-top: 5px;
+    height: 48px;
+    width: 48px;
+} */
+
+/* zlzp */
+#ISC_info {
+    position: fixed;
+    bottom: 25px;
+    margin-left: 800px;
     text-align: center;
     padding-top: 5px;
     height: 48px;
@@ -75,6 +112,25 @@
 
 #filterInput, #filterButton {
     margin: 3px 2px;
+}
+
+/* zlzp */
+#filterInput {
+    line-height: initial;
+    background: #fff;
+    width: 155px;
+    height: 21px;
+    border: 1px solid #aaa;
+}
+
+/* zlzp */
+#filterButton {
+    border: 1px solid #aaa;
+    background-color: #eee;
+    width: 31px;
+    height: 22px;
+    font-size: 14px;
+    margin-bottom: 6px;
 }
 
 #ISC_node_copy {
