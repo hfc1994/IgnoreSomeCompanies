@@ -24,6 +24,7 @@ function init() {
     try {
         companies = JSON.parse(window.localStorage.getItem('companies'))
         if (companies === null || companies === undefined || companies.length === 0) {
+            companies = []
             console.warn('页面暂无需要过滤的数据')
             return
         } else {
