@@ -10,7 +10,8 @@
 // @grant        none
 // ==/UserScript==
 // @todo 为智联招聘适配
-// @todo 忽略的条目获取
+// @todo 休眠一段时间之后再运行
+// @todo 监听指定的ajax请求，然后再做动态过滤
 
 let companies = []
 let website = ''
@@ -49,12 +50,12 @@ function judgeWebsite() {
 }
 
 function doIgnore() {
-    let compDivs = document.querySelectorAll('.dw_table .el');
+    let compDivs = getDivListToIgnore()
     compDivs.forEach((item) => {
         if (alreadyBeIgnored(item)) {
             return
         }
-        let cName = item.getElementsByClassName('t2')[0].textContent.trim()
+        let cName = getRealCompanyName(item)
         if (isIgnoreCompany(cName)) {
             console.log('匹配到：' + cName)
             addIgnoreClassTag(item)
@@ -63,21 +64,51 @@ function doIgnore() {
     })
 }
 
+function getDivListToIgnore() {
+    if (website === '51job') {
+        return document.querySelectorAll('.dw_table .el')
+    } else {
+        let nodeList = []
+        while (nodeList.length === 0) {
+            nodeList = document.querySelectorAll('.contentpile__content__wrapper .clearfix')
+            console.log('nodeList = ' + nodeList.length)
+            sleep(Date.now(), 500)
+        }
+        return nodeList
+    }
+}
+
+function sleep(srcTime, delay) {
+    while(Date.now() - srcTime <= delay);
+}
+
+function getRealCompanyName(node) {
+    if (website === '51job') {
+        return node.getElementsByClassName('t2')[0].textContent.trim()
+    } else {
+        return node.getElementsByClassName('company_title')[0].textContent.trim()
+    }
+}
+
 // 添加一些全局样式
 function appendGlobalStyle() {
     // 需要被忽略的节点
     buildStyle('.ISC_ignoreNode{height:30px !important;background-color:#ffe8cd !important;}')
     // 需要被忽略的子节点
     buildStyle('.ISC_ignoreChildNode{display:none !important;}')
-    // 新添加的节点
-    buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
     // toolbox节点里面的
     if (website === '51job') {
+        // 新添加的节点
+        buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
+
         buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
         buildStyle('#ISC_input {bottom: 182px;height: 30px;}')
         buildStyle('#ISC_content {bottom: 215px;min-height: 150px;}')
         buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
     } else {
+        // 新添加的节点
+        buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;padding-top: 5px;}')
+
         buildStyle('#ISC_info {position: fixed;bottom: 22px;margin-left: 800px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
         buildStyle('#ISC_input {bottom: 73px;height: 30px;}')
         buildStyle('#ISC_content {bottom: 106px;min-height: 150px;}')
