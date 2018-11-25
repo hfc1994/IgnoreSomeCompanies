@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      0.5
+// @version      0.65
 // @description  try to ignore some companies that i do not want to!
 // @author       枯木
 // @icon         https://avatars2.githubusercontent.com/u/32028349?s=40&v=4
@@ -10,7 +10,7 @@
 // @grant        none
 // ==/UserScript==
 // @todo 为智联招聘适配
-// @todo appendFloatDiv中悬浮toolbox的位置定位
+// @todo 忽略的条目获取
 
 let companies = []
 let website = ''
@@ -78,9 +78,9 @@ function appendGlobalStyle() {
         buildStyle('#ISC_content {bottom: 215px;min-height: 150px;}')
         buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
     } else {
-        buildStyle('#ISC_info {position: fixed;bottom: 25px;margin-left: 800px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
-        buildStyle('#ISC_input {bottom: 75px;height: 30px;}')
-        buildStyle('#ISC_content {bottom: 107px;min-height: 150px;}')
+        buildStyle('#ISC_info {position: fixed;bottom: 22px;margin-left: 800px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
+        buildStyle('#ISC_input {bottom: 73px;height: 30px;}')
+        buildStyle('#ISC_content {bottom: 106px;min-height: 150px;}')
         buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 800px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
 
         // 额外调整UI的

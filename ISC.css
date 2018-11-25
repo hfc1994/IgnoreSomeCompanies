@@ -10,7 +10,7 @@
 
 /* zlzp */
 #ISC_content {
-    bottom: 107px;
+    bottom: 106px;
     min-height: 150px;
 }
 
@@ -22,7 +22,7 @@
 
 /* zlzp */
 #ISC_input {
-    bottom: 75px;
+    bottom: 73px;
     height: 30px;
 }
 
@@ -60,7 +60,7 @@
 /* zlzp */
 #ISC_info {
     position: fixed;
-    bottom: 25px;
+    bottom: 22px;
     margin-left: 800px;
     text-align: center;
     padding-top: 5px;
