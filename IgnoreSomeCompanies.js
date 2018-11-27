@@ -9,9 +9,8 @@
 // @match        https://sou.zhaopin.com/*
 // @grant        none
 // ==/UserScript==
-// @todo 为智联招聘适配
-// @todo 休眠一段时间之后再运行
-// @todo 监听指定的ajax请求，然后再做动态过滤
+// @todo 尝试对按钮美化
+// @todo 除chrome外多浏览器适配---firefox，edge
 
 let companies = []
 let website = ''
@@ -78,7 +77,7 @@ function doIgnore() {
         }
         let cName = getRealCompanyName(item)
         if (isIgnoreCompany(cName)) {
-            console.log('匹配到：' + cName)
+            // console.log('匹配到：' + cName)
             addIgnoreClassTag(item)
             appendNewChildNode(item, cName)
         }
