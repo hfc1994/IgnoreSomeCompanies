@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      0.65
+// @version      0.85
 // @description  try to ignore some companies that i do not want to!
 // @author       枯木
 // @icon         https://avatars2.githubusercontent.com/u/32028349?s=40&v=4
@@ -43,10 +43,31 @@ function judgeWebsite() {
     let href = window.location.href
     if (href.indexOf('sou.zhaopin.com') !== -1) {
         website = 'zlzp'
+        addMutationObserver()
     } else {
         website = '51job'
     }
     console.log(website)
+}
+
+function addMutationObserver() {
+    // 因为zlzp使用的都是ajax加载的数据，所以只能通过监视DOM变动
+    let observer = new MutationObserver(() => {
+        console.log('DOM changed')
+        doIgnore()
+    })
+
+    let number = setInterval(() => {
+        let target = document.getElementById('listContent')
+        if (null !== target) {
+            doIgnore()  // DOM布局第一次形成，先过滤一遍
+            observer.observe(target, {'childList': true})
+            clearInterval(number)
+            console.log('observer设置完毕，定时任务结束')
+        } else {
+            console.log('dom还没有初始化完成，500毫秒后重试')
+        }
+    }, 500)
 }
 
 function doIgnore() {
@@ -68,18 +89,8 @@ function getDivListToIgnore() {
     if (website === '51job') {
         return document.querySelectorAll('.dw_table .el')
     } else {
-        let nodeList = []
-        while (nodeList.length === 0) {
-            nodeList = document.querySelectorAll('.contentpile__content__wrapper .clearfix')
-            console.log('nodeList = ' + nodeList.length)
-            sleep(Date.now(), 500)
-        }
-        return nodeList
+        return document.querySelectorAll('.contentpile__content__wrapper .clearfix')
     }
-}
-
-function sleep(srcTime, delay) {
-    while(Date.now() - srcTime <= delay);
 }
 
 function getRealCompanyName(node) {
