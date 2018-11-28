@@ -1,15 +1,14 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      0.85
-// @description  try to ignore some companies that i do not want to!
+// @version      1.0
+// @description  根据需要添加关键字，然后可以把页面上相对应公司的招聘条目给忽略
 // @author       枯木
 // @icon         https://avatars2.githubusercontent.com/u/32028349?s=40&v=4
 // @match        https://search.51job.com/list/*
 // @match        https://sou.zhaopin.com/*
 // @grant        none
 // ==/UserScript==
-// @todo 尝试对按钮美化
 // @todo 除chrome外多浏览器适配---firefox，edge
 
 let companies = []
@@ -59,7 +58,7 @@ function addMutationObserver() {
     let number = setInterval(() => {
         let target = document.getElementById('listContent')
         if (null !== target) {
-            doIgnore()  // DOM布局第一次形成，先过滤一遍
+            doIgnore() // DOM布局第一次形成，先过滤一遍
             observer.observe(target, {'childList': true})
             clearInterval(number)
             console.log('observer设置完毕，定时任务结束')
@@ -103,13 +102,13 @@ function getRealCompanyName(node) {
 // 添加一些全局样式
 function appendGlobalStyle() {
     // 需要被忽略的节点
-    buildStyle('.ISC_ignoreNode{height:30px !important;background-color:#ffe8cd !important;}')
+    buildStyle('.ISC_ignoreNode{height:30px !important;background-color:#dbecfe !important;}')
     // 需要被忽略的子节点
     buildStyle('.ISC_ignoreChildNode{display:none !important;}')
     // toolbox节点里面的
     if (website === '51job') {
         // 新添加的节点
-        buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;}')
+        buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;margin-top: -5px;color: #bababa;}')
 
         buildStyle('#ISC_info {position: fixed;bottom: 126px;margin-left: 1042px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
         buildStyle('#ISC_input {bottom: 182px;height: 30px;}')
@@ -117,7 +116,7 @@ function appendGlobalStyle() {
         buildStyle('#ISC_content,#ISC_input {position: fixed;margin-left: 890px;box-shadow: 1px 1px 3px 0px #a3a3a3;width: 200px;opacity: 0.75;z-index: 10;}')
     } else {
         // 新添加的节点
-        buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;padding-top: 5px;}')
+        buildStyle('.ISC_appendNode{font-size: 10px;text-align: center;padding-top: 5px;color: #bababa;}')
 
         buildStyle('#ISC_info {position: fixed;bottom: 22px;margin-left: 800px;text-align: center;padding-top: 5px;height: 48px;width: 48px;}')
         buildStyle('#ISC_input {bottom: 73px;height: 30px;}')
@@ -131,8 +130,8 @@ function appendGlobalStyle() {
     
     buildStyle('#ISC_info:hover {border-radius: 10px;box-shadow: 2px 2px 5px 0px #a3a3a3;}')
     buildStyle('#ISC_info:active {transform: scale(0.8);-webkit-transform: scale(0.8);-moz-transform: scale(0.8);-ms-transform: scale(0.8);}')
-    buildStyle('#ISC_content,#ISC_input,#ISC_info {background-color: #ecf5ff;border: 1px solid #409eff;color: #409eff;}')
-    buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;background-color: #cdcdcd;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
+    buildStyle('#ISC_content,#ISC_input,#ISC_info,.ISC_keyword {background-color: #ecf5ff;border: 1px solid #409eff;color: #409eff;}')
+    buildStyle('.ISC_keyword {margin: 5px;padding: 1px 2px;display: inline-block;color: #000;cursor: pointer;box-shadow: 2px 2px 4px 0px #a3a3a3;}')
     buildStyle('.ISC_keyword:hover {transform: scale(1.1);-webkit-transform: scale(1.1);-moz-transform: scale(1.1);-ms-transform: scale(1.1);}')
     buildStyle('#ISC_info,.ISC_keyword {transition: all 0.3s;-webkit-transition: all 0.3s;-moz-transition: all 0.3s;-ms-transition: all 0.3s;}')
 
@@ -232,10 +231,10 @@ function appendFloatDiv() {
     let input = document.createElement('div')
     input.id = 'ISC_input'
     input.style = 'display: none;'
-    input.innerHTML = '<input id="filterInput" placeholder="过滤的关键字" type="text"/><button id="filterButton" type="button">添加</button>'
+    input.innerHTML = '<input id="filterInput" placeholder="关键字" type="text"/><button id="filterButton" type="button">添加</button>'
     let info = document.createElement('div')
     info.id = 'ISC_info'
-    info.innerHTML = '<span>添加<br/>过滤</span>'
+    info.innerHTML = '<span>添加<br/>忽略</span>'
     info.onclick = function() {
         // 切换显示与否
         let visible = divVisibleSwitch()
@@ -266,7 +265,7 @@ function appendFloatDiv() {
             return
         }
         if (companies.length === 32) {
-            alert('过滤关键字限定数量为32，此时过滤关键字数量已达上限')
+            alert('关键字限定数量为32，此刻关键字数量已达上限，可点击关键字进行删减')
             document.getElementById('filterInput').value = ''
             return
         }
@@ -355,7 +354,7 @@ function buildContentChildNode(val, index) {
         companies.splice(tmpIndex, 1)
         modifyLocalStorage()
         correctNodeId(tmpIndex)
-        removeIgnoreClassTag(tmpKeyword)
+        removeIgnoredTag(tmpKeyword)
     }
 
     return childNode
@@ -366,7 +365,7 @@ function buildContentChildNode(val, index) {
 // index是刚被删除的节点的序号
 function correctNodeId(index) {
     for (let i = index+1; i<=companies.length; i++) {
-        let node  = document.getElementById('ISC_keyword_' + i)
+        let node = document.getElementById('ISC_keyword_' + i)
         if (null !== node) {
             node.id = 'ISC_keyword_' + (i - 1)
         }
@@ -374,15 +373,19 @@ function correctNodeId(index) {
 }
 
 // 被移除的关键字对应的条目被恢复可见
-function removeIgnoreClassTag(keyword) {
-    let compDivs = document.querySelectorAll('.dw_table .el');
+function removeIgnoredTag(keyword) {
+    let compDivs = getDivListToIgnore()
     compDivs.forEach(node => {
         if (alreadyBeIgnored(node)) {
-            let cName = node.getElementsByClassName('t2')[0].textContent.trim()
+            let cName = getRealCompanyName(node)
             if (cName.indexOf(keyword) !== -1) {
                 node.classList.remove('ISC_ignoreNode')
                 for (let j=0; j<node.children.length; j++) {
-                    node.children[j].classList.remove('ISC_ignoreChildNode')
+                    if (node.children[j].classList.contains('ISC_appendNode')) {
+                        node.children[j].remove()
+                    } else {
+                        node.children[j].classList.remove('ISC_ignoreChildNode')
+                    }
                 }
             }
         }

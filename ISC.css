@@ -68,7 +68,7 @@
     width: 48px;
 }
 
-#ISC_content,#ISC_input,#ISC_info {
+#ISC_content,#ISC_input,#ISC_info,.ISC_keyword{
     background-color: #ecf5ff;
     border: 1px solid #409eff;
     color: #409eff;
@@ -97,7 +97,6 @@
     margin: 5px;
     padding: 1px 2px;
     display: inline-block;
-    background-color: #cdcdcd;
     color: #000;
     cursor: pointer;
     box-shadow: 2px 2px 4px 0px #a3a3a3;
