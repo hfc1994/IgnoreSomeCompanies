@@ -4,12 +4,18 @@
 // @version      1.0
 // @description  根据需要添加关键字，然后可以把页面上相对应公司的招聘条目给忽略
 // @author       枯木
+// @license      GPL
 // @icon         https://avatars2.githubusercontent.com/u/32028349?s=40&v=4
 // @match        https://search.51job.com/list/*
 // @match        https://sou.zhaopin.com/*
 // @grant        none
 // ==/UserScript==
-// @todo 除chrome外多浏览器适配---firefox，edge
+// @todo 测试Edge
+
+/**
+ * 根据添加的指定关键字，忽略求职网站上指定公司的招聘条目
+ * 如果发现bug，非常欢迎向我提出来https://github.com/hfc1994/IgnoreSomeCompanies
+ */
 
 let companies = []
 let website = ''
