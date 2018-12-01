@@ -27,3 +27,7 @@
 ![AddOrDelete](./image/AddOrDelete.jpg "添加或删除关键字")
 ![Effect](./image/Effect.jpg "效果")
 
+
+## 其它声明
+
+部分创意借鉴自另外一个扩展--眼不见心不烦（新浪微博）
