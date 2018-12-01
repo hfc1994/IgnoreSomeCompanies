@@ -1,7 +1,7 @@
 # IgnoreSomeCompanies
 
 ## 用途
-在两个目标求职网站上根据指定的关键字，忽略指定公司的招聘条目。
+在两个目标求职网站上根据指定的关键字（公司名称里的关键字），忽略指定公司的招聘条目。
 
 ## 目标网站
 暂时只支持前程无忧www.51job.com和智联招聘www.zhaopin.com
@@ -13,7 +13,7 @@
 
 - 在浏览器里通过其对应的下载方式下载安装第三方扩展Tampermonkey（另外两种脚本管理器Greasemonkey和Violentmonkey理论上也行，但是我没使用过，所以这里就不推荐了）。  
 
-![Tampermonkey](./image/ChromeTampermonkey.jpg "Tampermonkey扩展图标")
+![Tampermonkey](./image/Tampermonkey.jpg "Tampermonkey扩展图标")
 
 
 - 然后访问[Greasy Fork-IgnoreSomeCompanies](https://greasyfork.org/zh-CN/scripts/374962-ignoresomecompanies)，或者在该网站[Greasy Fork](https://greasyfork.org/zh-CN)上搜索**IgnoreSomeCompanies**（网站首页也有使用教程）来安装脚本。
