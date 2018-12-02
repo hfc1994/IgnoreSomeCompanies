@@ -7,7 +7,7 @@
 暂时只支持前程无忧www.51job.com和智联招聘www.zhaopin.com
 
 ## 运行环境
-依托于Tampermonkey脚本管理器，已在Google Chrome、Mozilla Firefox和Microsoft Edge上测试正常使用（但所需浏览器最低版本不详），其它套壳并可以安装Tampermonkey的浏览器理论上也是可以运行的。
+依托于Tampermonkey脚本管理器，已在Google Chrome、Mozilla Firefox和Microsoft Edge上测试正常使用（已知最低支持Chrome 50，其它两个不详），其它套壳并可以安装Tampermonkey的浏览器理论上也是可以运行的。
 
 ## 使用方式
 

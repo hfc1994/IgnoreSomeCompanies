@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      1.0
+// @version      1.1.0
 // @description  根据需要添加关键字，然后可以把页面上相对应公司的招聘条目给忽略
 // @author       枯木
 // @license      GPL
@@ -10,7 +10,6 @@
 // @match        https://sou.zhaopin.com/*
 // @grant        none
 // ==/UserScript==
-// @todo 测试Edge
 
 /**
  * 根据添加的指定关键字，忽略求职网站上指定公司的招聘条目
@@ -57,7 +56,7 @@ function judgeWebsite() {
 function addMutationObserver() {
     // 因为zlzp使用的都是ajax加载的数据，所以只能通过监视DOM变动
     let observer = new MutationObserver(() => {
-        console.log('DOM changed')
+        // console.log('DOM changed')
         doIgnore()
     })
 
@@ -67,18 +66,19 @@ function addMutationObserver() {
             doIgnore() // DOM布局第一次形成，先过滤一遍
             observer.observe(target, {'childList': true})
             clearInterval(number)
-            console.log('observer设置完毕，定时任务结束')
+            // console.log('observer设置完毕，定时任务结束')
         } else {
-            console.log('dom还没有初始化完成，500毫秒后重试')
+            // console.log('dom还没有初始化完成，500毫秒后重试')
         }
     }, 500)
 }
 
 function doIgnore() {
     let compDivs = getDivListToIgnore()
-    compDivs.forEach((item) => {
+    for (let i=0; i<compDivs.length; i++) {
+        let item = compDivs[i]
         if (alreadyBeIgnored(item)) {
-            return
+            continue
         }
         let cName = getRealCompanyName(item)
         if (isIgnoreCompany(cName)) {
@@ -86,7 +86,7 @@ function doIgnore() {
             addIgnoreClassTag(item)
             appendNewChildNode(item, cName)
         }
-    })
+    }
 }
 
 function getDivListToIgnore() {
@@ -216,7 +216,7 @@ function appendNewChildNode(node, name) {
 
         let nextNode = fNode.nextSibling
         if (nextNode === null) {
-            fNode.parentNode.append(fNodeCopy)
+            fNode.parentNode.appendChild(fNodeCopy)
         } else {
             fNode.parentNode.insertBefore(fNodeCopy, nextNode)
         }
@@ -259,9 +259,9 @@ function appendFloatDiv() {
     toolbox.appendChild(info)
 
     if (website === '51job') {
-        document.getElementById('resultList').append(toolbox)
+        document.getElementById('resultList').appendChild(toolbox)
     } else {
-        document.getElementById('listItemPile').append(toolbox)
+        document.getElementById('listItemPile').appendChild(toolbox)
     }
 
     document.getElementById('filterButton').onclick = function () {
@@ -381,7 +381,8 @@ function correctNodeId(index) {
 // 被移除的关键字对应的条目被恢复可见
 function removeIgnoredTag(keyword) {
     let compDivs = getDivListToIgnore()
-    compDivs.forEach(node => {
+    for (let i=0; i<compDivs.length; i++) {
+        let node = compDivs[i]
         if (alreadyBeIgnored(node)) {
             let cName = getRealCompanyName(node)
             if (cName.indexOf(keyword) !== -1) {
@@ -395,7 +396,7 @@ function removeIgnoredTag(keyword) {
                 }
             }
         }
-    })
+    }
 }
 
 // 入口函数
