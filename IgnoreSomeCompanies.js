@@ -270,8 +270,8 @@ function appendFloatDiv() {
             alert('不能使用空字符串')
             return
         }
-        if (companies.length === 32) {
-            alert('关键字限定数量为32，此刻关键字数量已达上限，可点击关键字进行删减')
+        if (companies.length === 128) {
+            alert('关键字限定数量为128，此刻关键字数量已达上限，可点击关键字进行删减')
             document.getElementById('filterInput').value = ''
             return
         }
