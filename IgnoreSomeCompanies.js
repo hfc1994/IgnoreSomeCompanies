@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IgnoreSomeCompanies
 // @namespace    https://github.com/hfc1994
-// @version      1.1.0
+// @version      1.1.1
 // @description  根据需要添加关键字，然后可以把页面上相对应公司的招聘条目给忽略
 // @author       枯木
 // @license      GPL
